@@ -6,10 +6,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+import snakeris.logic.Field;
+import snakeris.logic.Snake;
+import snakeris.ui.FieldPaneMapping;
 
 import java.util.Random;
 
@@ -26,25 +28,27 @@ public class Main extends Application {
 
 
     private Pane root;
+    private Field field;
+    private FieldPaneMapping fieldPaneMapping;
     private Snake snake;
     private AnimationTimer timer;
     private volatile Direction dir = Direction.RIGHT;
     private volatile boolean dirChanged = false;
-    private Random random = new Random();
-    private int foodPos;
-    private Circle food;
-
+    private volatile boolean active = true;
 
     private Parent createContent(){
+        field = new Field(20,40);
         root = new Pane();
         root.setPrefSize(WIDTH, HEIGHT);
         drawGrid();
-        snake = new Snake(4, root, GRID_SIZE, WIDTH/ GRID_SIZE, HEIGHT/ GRID_SIZE);
+        fieldPaneMapping = new FieldPaneMapping(field, root, GRID_SIZE);
+        snake = new Snake(4, field);
 
         timer = new AnimationTimer() {
             long last = 0;
             @Override
             public void handle(long now) {
+                if(!active) return;
                 if(last==0){
                     last = now;
                     return;
@@ -63,7 +67,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("TetriSnake");
         Scene scene = new Scene(createContent());
         primaryStage.setScene(scene);
@@ -85,6 +88,8 @@ public class Main extends Application {
                 case S:
                     setDir(Direction.BOTTOM);
                     break;
+                case SPACE:
+                    active = !active;
                 default:
                     break;
             }
@@ -93,6 +98,7 @@ public class Main extends Application {
     }
 
     public void setDir(Direction dir) {
+        if(!active) return;
         if(dir.isOpposite(snake.getDir())) return;
         this.dir = dir;
         dirChanged = true;
