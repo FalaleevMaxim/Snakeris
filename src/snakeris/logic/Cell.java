@@ -32,4 +32,9 @@ public class Cell {
         this.content = content;
         field.cellUpdated(this, old);
     }
+
+    @Override
+    public String toString() {
+        return "Cell ["+x+';'+y+"]: "+content.getName();
+    }
 }

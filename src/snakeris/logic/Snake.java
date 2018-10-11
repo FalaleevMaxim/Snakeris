@@ -3,14 +3,19 @@ package snakeris.logic;
 import snakeris.Direction;
 import snakeris.logic.cell.EmptyCellContent;
 import snakeris.logic.cell.SnakeCellContent;
+import snakeris.logic.exception.SnakeDiedException;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Snake {
     private final Field field;
     private LinkedList<Cell> bodyParts = new LinkedList<>();
     volatile private Direction dir = Direction.RIGHT;
+    private int toGrow = 0;
     private int headX, headY;
+    private boolean dead = false;
 
     public Snake(int initLengh, Field field) {
         if(field==null) throw new NullPointerException("Field is null");
@@ -18,6 +23,7 @@ public class Snake {
             throw new IllegalArgumentException("Negative or null length of snake!");
         }
         this.field = field;
+        field.setSnake(this);
         for (int i = initLengh-1; i >=0 ; i--) {
             Cell cell = field.getCell(i, 0);
             cell.setContent(new SnakeCellContent());
@@ -28,9 +34,13 @@ public class Snake {
     }
 
     public void move(){
-        bodyParts.getLast().setContent(EmptyCellContent.instance);
-        bodyParts.removeLast();
-
+        if(dead) throw new SnakeDiedException();
+        if(toGrow>0) {
+            toGrow--;
+        } else {
+            bodyParts.getLast().setContent(EmptyCellContent.instance);
+            bodyParts.removeLast();
+        }
         int width = field.getWidth();
         int height = field.getHeight();
 
@@ -70,11 +80,37 @@ public class Snake {
         return dir;
     }
 
+    public void grow(){
+        toGrow++;
+    }
+
     public int getHeadX() {
         return headX;
     }
 
     public int getHeadY() {
         return headY;
+    }
+
+    public void eatenTail(Cell eaten){
+        if(!bodyParts.contains(eaten)) throw new IllegalArgumentException("Cell is not part of snake");
+        List<Cell> separated = new ArrayList<>(bodyParts.size()/2);
+        Cell removed;
+        do{
+             removed = bodyParts.removeLast();
+             if(!removed.equals(eaten)) {
+                 separated.add(removed);
+             }
+        }while (!removed.equals(eaten));
+        new FallingBlock(separated, field);
+        grow();
+    }
+
+    public void die(){
+        dead = true;
+    }
+
+    public boolean isDead() {
+        return dead;
     }
 }

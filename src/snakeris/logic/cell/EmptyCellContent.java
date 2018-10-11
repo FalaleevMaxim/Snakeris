@@ -19,4 +19,14 @@ public class EmptyCellContent implements CellContent {
     @Override
     public void eat(Field field, Snake snake, Cell thisCell) {
     }
+
+    @Override
+    public boolean transformsBlock() {
+        return false;
+    }
+
+    @Override
+    public boolean stopsFallingBlock() {
+        return false;
+    }
 }

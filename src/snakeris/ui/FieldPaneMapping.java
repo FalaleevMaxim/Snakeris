@@ -3,13 +3,12 @@ package snakeris.ui;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import snakeris.listener.CellUpdateListener;
 import snakeris.logic.Cell;
 import snakeris.logic.Field;
-import snakeris.logic.cell.CellContent;
-import snakeris.logic.cell.EmptyCellContent;
-import snakeris.logic.cell.SnakeCellContent;
+import snakeris.logic.cell.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,21 @@ public class FieldPaneMapping implements CellUpdateListener {
 
     private void initMappers() {
         mappers.put(EmptyCellContent.NAME, (cell, cellSize) -> null);
-        mappers.put(SnakeCellContent.NAME, (cell, cellSize) -> new Rectangle(cellSize, cellSize, Color.DARKGREEN));
+        mappers.put(SnakeCellContent.NAME, (cell, cellSize) -> createRectangle(cell, cellSize, Color.DARKGREEN));
+        mappers.put(FoodCellContent.NAME, (cell, cellSize1) -> {
+            double radius = cellSize1 / 2.;
+            return new Circle(cell.getX()*cellSize+radius, cell.getY()*cellSize+radius, radius, Color.YELLOW);
+        });
+        mappers.put(FallingBlockCellContent.NAME, (cell, cellSize) -> createRectangle(cell, cellSize, Color.DARKRED));
+        mappers.put(StaticCellContent.NAME, (cell, cellSize) -> createRectangle(cell, cellSize, Color.BLACK));
+
+    }
+
+    private Node createRectangle(Cell cell, int cellSize, Color color) {
+        Rectangle rect = new Rectangle(cellSize, cellSize, color);
+        rect.setTranslateX(cell.getX() * cellSize);
+        rect.setTranslateY(cell.getY() * cellSize);
+        return rect;
     }
 
     @Override
@@ -52,8 +65,6 @@ public class FieldPaneMapping implements CellUpdateListener {
             fieldNodes[x][y] = null;
         }
         if(node!=null){
-            node.setTranslateX(x*cellSize);
-            node.setTranslateY(y*cellSize);
             pane.getChildren().add(node);
         }
         fieldNodes[x][y] = node;

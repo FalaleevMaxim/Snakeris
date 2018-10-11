@@ -14,6 +14,17 @@ public class SnakeCellContent implements CellContent {
 
     @Override
     public void eat(Field field, Snake snake, Cell thisCell) {
+        System.out.println("Snake eating tail");
+        snake.eatenTail(thisCell);
+    }
 
+    @Override
+    public boolean transformsBlock() {
+        return false;
+    }
+
+    @Override
+    public boolean stopsFallingBlock() {
+        return true;
     }
 }

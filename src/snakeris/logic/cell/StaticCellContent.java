@@ -4,11 +4,11 @@ import snakeris.logic.Cell;
 import snakeris.logic.Field;
 import snakeris.logic.Snake;
 
-public class FoodCellContent implements CellContent {
-    public static final FoodCellContent instance = new FoodCellContent();
-    public static final String NAME = "Food";
+public class StaticCellContent implements CellContent {
+    public static final String NAME = "Static";
+    public static final StaticCellContent instance = new StaticCellContent();
 
-    private FoodCellContent() {
+    private StaticCellContent() {
     }
 
     @Override
@@ -18,17 +18,16 @@ public class FoodCellContent implements CellContent {
 
     @Override
     public void eat(Field field, Snake snake, Cell thisCell) {
-        snake.grow();
-        field.randomizeFood();
+        snake.die();
     }
 
     @Override
     public boolean transformsBlock() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean stopsFallingBlock() {
-        return false;
+        return true;
     }
 }
