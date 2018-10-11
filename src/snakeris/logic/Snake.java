@@ -102,7 +102,9 @@ public class Snake {
                  separated.add(removed);
              }
         }while (!removed.equals(eaten));
-        new FallingBlock(separated, field);
+        if(!separated.isEmpty()) {
+            new FallingBlock(separated, field);
+        }
         grow();
     }
 

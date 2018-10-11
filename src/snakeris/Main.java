@@ -46,7 +46,7 @@ public class Main extends Application {
         root.setPrefSize(WIDTH*GRID_SIZE, HEIGHT*GRID_SIZE);
         drawGrid();
         fieldPaneMapping = new FieldPaneMapping(field, root, GRID_SIZE);
-        snake = new Snake(10, field);
+        snake = new Snake(15, field);
         field.randomizeFood();
 
         AnimationTimer timer = new AnimationTimer() {

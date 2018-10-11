@@ -13,17 +13,17 @@ public class FallingBlock {
     private final Field field;
 
     public FallingBlock(Collection<Cell> cells, Field field) {
+        if(cells.isEmpty()) throw new IllegalArgumentException("Empty falling block");
         this.field = field;
         cells.forEach(cell -> cell.setContent(new FallingBlockCellContent(this)));
         this.cells.addAll(cells.stream()
                 .sorted(Comparator.comparingInt(Cell::getY).reversed())
                 .collect(Collectors.toList()));
         field.addFallingBlock(this);
-        System.out.println("Added falling block to field");
+        checkAndSeparate();
     }
 
     public boolean tryTransform(){
-        System.out.println("Attempt to transform block");
         boolean shouldTransform = false;
         for (Cell cell : cells) {
             Cell lower = field.getCell(cell.getX(), cell.getY() + 1);
@@ -38,11 +38,9 @@ public class FallingBlock {
             }
         }
         if(shouldTransform){
-            System.out.println("Transforming block");
             transform();
             return true;
         }
-        System.out.println("Did not transform block");
         return false;
     }
 
@@ -53,7 +51,6 @@ public class FallingBlock {
     }
 
     public boolean tryStop() {
-        System.out.println("Attempt to stop block");
         boolean canStop = false;
         for (Cell cell : cells) {
             Cell lower = field.getCell(cell.getX(), cell.getY() + 1);
@@ -102,5 +99,31 @@ public class FallingBlock {
     public void cellEaten(Cell cell) {
         cells.remove(cell);
         if(cells.isEmpty()) field.removeFallingBlock(this);
+        else checkAndSeparate();
+    }
+
+    private void checkAndSeparate(){
+        Set<Cell> separated = integrityCheck();
+        if(separated.isEmpty()) return;
+        cells.removeAll(separated);
+        new FallingBlock(separated, field);
+    }
+
+    private Set<Cell> integrityCheck(){
+        Set<Cell> separated = new HashSet<>(cells);
+        integrityCheck(cells.get(0), separated);
+        return separated;
+    }
+
+    private void integrityCheck(Cell cell, Set<Cell> rest){
+        if(cell==null) return;
+        if(!cells.contains(cell)) return;
+        if(!rest.remove(cell)) return;
+        int x = cell.getX();
+        int y = cell.getY();
+        integrityCheck(field.getCell(x - 1, y), rest);
+        integrityCheck(field.getCell(x + 1, y), rest);
+        integrityCheck(field.getCell(x, y+1), rest);
+        integrityCheck(field.getCell(x, y-1), rest);
     }
 }
