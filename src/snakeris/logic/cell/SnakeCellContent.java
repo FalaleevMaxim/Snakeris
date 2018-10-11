@@ -7,6 +7,16 @@ import snakeris.logic.Snake;
 public class SnakeCellContent implements CellContent {
     public static final String NAME = "Snake";
 
+    private final Snake snake;
+
+    public SnakeCellContent(Snake snake) {
+        this.snake = snake;
+    }
+
+    public Snake getSnake() {
+        return snake;
+    }
+
     @Override
     public String getName() {
         return NAME;
@@ -14,7 +24,6 @@ public class SnakeCellContent implements CellContent {
 
     @Override
     public void eat(Field field, Snake snake, Cell thisCell) {
-        System.out.println("Snake eating tail");
         snake.eatenTail(thisCell);
     }
 
@@ -26,5 +35,10 @@ public class SnakeCellContent implements CellContent {
     @Override
     public boolean stopsFallingBlock() {
         return true;
+    }
+
+    @Override
+    public void onStaticFall(Cell cell, Field field) {
+        snake.removeBodyBlock(cell);
     }
 }

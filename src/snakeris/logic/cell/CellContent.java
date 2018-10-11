@@ -10,4 +10,5 @@ public interface CellContent {
     void eat(Field field, Snake snake, Cell thisCell);
     boolean transformsBlock();
     boolean stopsFallingBlock();
+    void onStaticFall(Cell cell, Field field);
 }

@@ -40,6 +40,11 @@ public class FallingBlockCellContent implements CellContent {
         return stopped;
     }
 
+    @Override
+    public void onStaticFall(Cell cell, Field field) {
+        block.transform();
+    }
+
     public boolean isStopped() {
         return stopped;
     }

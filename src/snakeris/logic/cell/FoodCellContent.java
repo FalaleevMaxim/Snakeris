@@ -19,7 +19,7 @@ public class FoodCellContent implements CellContent {
     @Override
     public void eat(Field field, Snake snake, Cell thisCell) {
         snake.grow();
-        field.randomizeFood();
+        field.onFoodEaten();
     }
 
     @Override
@@ -30,5 +30,10 @@ public class FoodCellContent implements CellContent {
     @Override
     public boolean stopsFallingBlock() {
         return false;
+    }
+
+    @Override
+    public void onStaticFall(Cell cell, Field field) {
+        field.randomizeFood();
     }
 }

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 public class Field {
     private Cell[][] cells;
@@ -16,7 +18,9 @@ public class Field {
     private Snake snake;
     private List<FallingBlock> fallingBlocks = new LinkedList<>();
 
-    private final List<CellUpdateListener> listeners = new ArrayList<>();
+    private final List<CellUpdateListener> cellListeners = new ArrayList<>();
+    private final List<Runnable> eatListeners = new ArrayList<>();
+    private final List<Consumer<Integer>> rowRemoveListeners = new ArrayList<>();
 
     public Field(int width, int height) {
         this.width = width;
@@ -28,6 +32,11 @@ public class Field {
                 cells[x][y] = new Cell(this, x, y);
             }
         }
+        rowRemoveListeners.add(n -> {
+            for (int i = 0; i < n; i++) {
+                randomizeFood();
+            }
+        });
     }
 
     public int getWidth() {
@@ -61,16 +70,25 @@ public class Field {
                 }
             }
         }
+        if(emptyCells.isEmpty()) return;
         emptyCells.get(foodRandom.nextInt(emptyCells.size()))
                 .setContent(FoodCellContent.instance);
     }
 
     public void addCellListener(CellUpdateListener listener){
-        listeners.add(listener);
+        cellListeners.add(listener);
+    }
+
+    public void addEatListener(Runnable listener){
+        eatListeners.add(listener);
+    }
+
+    public void addRowRemoveListener(Consumer<Integer> listener){
+        rowRemoveListeners.add(listener);
     }
 
     void cellUpdated(Cell cell, CellContent old){
-        for (CellUpdateListener listener : listeners) {
+        for (CellUpdateListener listener : cellListeners) {
             listener.onCellUpdate(cell, old);
         }
     }
@@ -84,7 +102,9 @@ public class Field {
 
         boolean nothingToTransform = false;
         while (!nothingToTransform && !fallingBlocks.isEmpty()) {
-            if(!fallingBlocks.removeIf(FallingBlock::tryTransform)){
+            if(fallingBlocks.removeIf(FallingBlock::tryTransform)){
+                removeStaticRows();
+            }else {
                 nothingToTransform = true;
             }
         }
@@ -110,7 +130,48 @@ public class Field {
         fallingBlocks.remove(block);
     }
 
+    private void removeStaticRows(){
+        int removed = 0;
+        for (int y = height-1; y > 0 ;) {
+            boolean filled = true;
+            for (int x = 0; x < width; x++) {
+                if(!cells[x][y].getContent().getName().equals(StaticCellContent.NAME)) {
+                    filled = false;
+                    break;
+                }
+            }
+            if(filled){
+                removeStaticRow(y);
+                removed++;
+            }else {
+                y--;
+            }
+        }
+        int res = removed;
+        rowRemoveListeners.forEach(listener -> listener.accept(res));
+    }
+
+    private void removeStaticRow(int row) {
+        for (int y = row; y>0; y--) {
+            for (int x = 0; x < width; x++) {
+                CellContent upperCellContent = cells[x][y - 1].getContent();
+                if(upperCellContent instanceof StaticCellContent) {
+                    cells[x][y].getContent().onStaticFall(cells[x][y], this);
+                    cells[x][y-1].setContent(EmptyCellContent.instance);
+                    cells[x][y].setContent(StaticCellContent.instance);
+                }else if(cells[x][y].getContent() instanceof StaticCellContent){
+                    cells[x][y].setContent(EmptyCellContent.instance);
+                }
+            }
+        }
+    }
+
     public void setSnake(Snake snake) {
         this.snake = snake;
+    }
+
+    public void onFoodEaten() {
+        randomizeFood();
+        eatListeners.forEach(Runnable::run);
     }
 }

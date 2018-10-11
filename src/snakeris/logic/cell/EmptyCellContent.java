@@ -29,4 +29,9 @@ public class EmptyCellContent implements CellContent {
     public boolean stopsFallingBlock() {
         return false;
     }
+
+    @Override
+    public void onStaticFall(Cell cell, Field field) {
+
+    }
 }

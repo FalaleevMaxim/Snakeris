@@ -14,6 +14,7 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import snakeris.logic.Field;
 import snakeris.logic.Snake;
+import snakeris.logic.cell.StaticCellContent;
 import snakeris.ui.FieldPaneMapping;
 
 import java.util.Optional;
@@ -39,6 +40,7 @@ public class Main extends Application {
     private volatile Direction dir = Direction.RIGHT;
     private volatile boolean dirChanged = false;
     private volatile boolean active = true;
+    private int score = 0;
 
     private Parent createContent(){
         field = new Field(WIDTH,HEIGHT);
@@ -48,6 +50,8 @@ public class Main extends Application {
         fieldPaneMapping = new FieldPaneMapping(field, root, GRID_SIZE);
         snake = new Snake(15, field);
         field.randomizeFood();
+        field.addEatListener(() -> setScore(score + 1));
+        field.addRowRemoveListener(n -> setScore(score + (2*100+(n-1)*100)*n/2));
 
         AnimationTimer timer = new AnimationTimer() {
             long lastSnakeMove = 0;
@@ -85,9 +89,11 @@ public class Main extends Application {
 
     private void notifyGameOver() {
         Dialog<ButtonType> d = new Alert(Alert.AlertType.ERROR, "Игра окончена! Перезапустить?", ButtonType.FINISH, ButtonType.NEXT);
+        d.setHeaderText("Счёт: "+score);
         d.setTitle("Game over!");
         Optional<ButtonType> button = d.showAndWait();
         if(button.orElse(ButtonType.FINISH).equals(ButtonType.FINISH)){
+            Platform.exit();
             return;
         }
         start(primaryStage);
@@ -96,7 +102,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage){
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("TetriSnake");
+        setScore(0);
         Scene scene = new Scene(createContent());
         primaryStage.setScene(scene);
         scene.setOnKeyPressed(e -> {
@@ -144,5 +150,10 @@ public class Main extends Application {
             line.setStroke(Color.valueOf("#EEEEEE"));
             root.getChildren().add(line);
         }
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+        primaryStage.setTitle("Snakeris\tСчёт: "+score);
     }
 }

@@ -26,7 +26,7 @@ public class Snake {
         field.setSnake(this);
         for (int i = initLengh-1; i >=0 ; i--) {
             Cell cell = field.getCell(i, 0);
-            cell.setContent(new SnakeCellContent());
+            cell.setContent(new SnakeCellContent(this));
             bodyParts.add(cell);
         }
         headX = initLengh-1;
@@ -66,7 +66,7 @@ public class Snake {
         }
         Cell headCell = field.getCell(headX, headY);
         headCell.getContent().eat(field, this, headCell);
-        headCell.setContent(new SnakeCellContent());
+        headCell.setContent(new SnakeCellContent(this));
         bodyParts.addFirst(headCell);
     }
 
@@ -93,18 +93,7 @@ public class Snake {
     }
 
     public void eatenTail(Cell eaten){
-        if(!bodyParts.contains(eaten)) throw new IllegalArgumentException("Cell is not part of snake");
-        List<Cell> separated = new ArrayList<>(bodyParts.size()/2);
-        Cell removed;
-        do{
-             removed = bodyParts.removeLast();
-             if(!removed.equals(eaten)) {
-                 separated.add(removed);
-             }
-        }while (!removed.equals(eaten));
-        if(!separated.isEmpty()) {
-            new FallingBlock(separated, field);
-        }
+        removeBodyBlock(eaten);
         grow();
     }
 
@@ -114,5 +103,20 @@ public class Snake {
 
     public boolean isDead() {
         return dead;
+    }
+
+    public void removeBodyBlock(Cell cell) {
+        if(!bodyParts.contains(cell)) throw new IllegalArgumentException("Cell is not part of snake");
+        List<Cell> separated = new ArrayList<>(bodyParts.size()/2);
+        Cell removed;
+        do{
+            removed = bodyParts.removeLast();
+            if(!removed.equals(cell)) {
+                separated.add(removed);
+            }
+        }while (!removed.equals(cell));
+        if(!separated.isEmpty()) {
+            new FallingBlock(separated, field);
+        }
     }
 }

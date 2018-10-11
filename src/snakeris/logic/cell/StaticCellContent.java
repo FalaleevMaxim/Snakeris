@@ -30,4 +30,9 @@ public class StaticCellContent implements CellContent {
     public boolean stopsFallingBlock() {
         return true;
     }
+
+    @Override
+    public void onStaticFall(Cell cell, Field field) {
+
+    }
 }

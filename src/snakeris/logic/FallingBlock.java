@@ -44,7 +44,7 @@ public class FallingBlock {
         return false;
     }
 
-    private void transform(){
+    public void transform(){
         for (Cell cell : cells) {
             cell.setContent(StaticCellContent.instance);
         }
@@ -97,6 +97,10 @@ public class FallingBlock {
     }
 
     public void cellEaten(Cell cell) {
+        removeCell(cell);
+    }
+
+    public void removeCell(Cell cell){
         cells.remove(cell);
         if(cells.isEmpty()) field.removeFallingBlock(this);
         else checkAndSeparate();
