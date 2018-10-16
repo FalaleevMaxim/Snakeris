@@ -3,6 +3,9 @@ package snakeris.logic;
 import snakeris.logic.cell.CellContent;
 import snakeris.logic.cell.EmptyCellContent;
 
+/**
+ * Ячейка поля. Содержит координаты и содержимое.
+ */
 public class Cell {
     private final Field field;
     private final int x;

@@ -4,9 +4,15 @@ import snakeris.logic.Cell;
 import snakeris.logic.Field;
 import snakeris.logic.Snake;
 
+/**
+ * Ячейка тела змеи
+ */
 public class SnakeCellContent implements CellContent {
     public static final String NAME = "Snake";
 
+    /**
+     * Ссылка на змею
+     */
     private final Snake snake;
 
     public SnakeCellContent(Snake snake) {
@@ -22,6 +28,12 @@ public class SnakeCellContent implements CellContent {
         return NAME;
     }
 
+    /**
+     * ри поедании хвоста у змеи вызывается соответствующий метод
+     * @param field ссылка на поле
+     * @param snake змея
+     * @param thisCell ячейка, к которой относится это содержимое
+     */
     @Override
     public void eat(Field field, Snake snake, Cell thisCell) {
         snake.eatenTail(thisCell);
@@ -37,6 +49,11 @@ public class SnakeCellContent implements CellContent {
         return true;
     }
 
+    /**
+     * Упавший на змею статический блок уничтожает блок змеи.
+     * @param cell
+     * @param field ссылка на поле
+     */
     @Override
     public void onStaticFall(Cell cell, Field field) {
         snake.removeBodyBlock(cell);

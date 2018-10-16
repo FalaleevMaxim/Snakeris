@@ -4,9 +4,13 @@ import snakeris.logic.Cell;
 import snakeris.logic.Field;
 import snakeris.logic.Snake;
 
+/**
+ * Пустое содержимое ячейки. Не содержит состояния, поэтому является синглтоном
+ */
 public class EmptyCellContent implements CellContent {
-    public static final EmptyCellContent instance = new EmptyCellContent();
     public static final String NAME = "Empty";
+
+    public static final EmptyCellContent instance = new EmptyCellContent();
 
     private EmptyCellContent() {
     }

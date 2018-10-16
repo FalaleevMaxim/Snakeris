@@ -1,5 +1,8 @@
 package snakeris;
 
+/**
+ * аправление движения
+ */
 public enum Direction {
     LEFT{
         @Override
@@ -26,6 +29,11 @@ public enum Direction {
         }
     };
 
+    /**
+     * Проверяет, является ли переданное направление противоположным данному
+     * @param dir
+     * @return {@code true} если направления противоположны
+     */
     public boolean isOpposite(Direction dir){
         return false;
     }
